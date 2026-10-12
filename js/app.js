@@ -9,6 +9,7 @@ import { DiceRoller } from './dice.js';
 import { apiClient } from './api.js';
 import { sound } from './audio.js';
 import { PixelRenderer } from './canvas-pixel.js';
+import { BattleSceneAnimator } from './battle-scene.js';
 import { GameStorage } from './storage.js';
 import { CAMPAIGN_DEFINITIONS, getCampaignById, getRandomCampaign } from './campaigns.js';
 import { ChronicleManager } from './chronicle.js';
@@ -18,6 +19,7 @@ class GameApp {
     this.player = null;
     this.party = null;
     this.diceRoller = null;
+    this.battleScene = null;
     this.turn = 0;
     this.currentCampaign = CAMPAIGN_DEFINITIONS[0];
     this.currentChapter = this.currentCampaign.chapterName;
@@ -49,7 +51,9 @@ class GameApp {
       this.initUncreatedState();
     }
 
-    // 3. Initialize Dice Roller
+    // 3. Initialize Battle Scene Animator & Dice Roller
+    this.battleScene = new BattleSceneAnimator('scene-canvas');
+    this.battleScene.start();
     this.diceRoller = new DiceRoller('dice-canvas');
 
     // 4. Render All UI Components
@@ -288,11 +292,21 @@ class GameApp {
         this.triggerCompanionAction(compId);
       };
     });
+
+    // Update actors in battle scene banner
+    if (this.battleScene) {
+      this.battleScene.setActors(this.player, comps);
+    }
   }
 
   renderSceneBanner() {
-    const sceneCanvas = document.getElementById('scene-canvas');
-    PixelRenderer.drawScene(sceneCanvas, this.currentScene);
+    if (this.battleScene) {
+      this.battleScene.setScene(this.currentScene);
+      this.battleScene.setActors(this.player, this.party ? this.party.getAll() : []);
+    } else {
+      const sceneCanvas = document.getElementById('scene-canvas');
+      PixelRenderer.drawScene(sceneCanvas, this.currentScene);
+    }
 
     const titleEl = document.getElementById('scene-location-title');
     const weatherEl = document.getElementById('scene-weather');
@@ -404,6 +418,16 @@ class GameApp {
     this.storyLogs.push(playerMsg);
     this.renderStoryFeed();
 
+    // Trigger Scene Banner Combat / Heal Animation if relevant
+    if (this.battleScene) {
+      const lower = text.toLowerCase();
+      if (/tấn công|chém|đánh|đâm|xông lên|trảm|xuất kiếm|bắn|vận công xuất chiêu|sát thương|tiêu diệt|bát quái|phi kiếm/.test(lower)) {
+        this.battleScene.playAttack(0);
+      } else if (/hồi máu|uống đan|trị thương|vận công hồi phục|hồi huyết|phù chú hồi/.test(lower)) {
+        this.battleScene.playHeal(0, '+HP HỒI MÁU');
+      }
+    }
+
     // 2. Clear action input
     document.getElementById('action-input').value = '';
 
@@ -500,8 +524,14 @@ class GameApp {
       const delta = parseInt(hpMatch[1], 10);
       if (delta < 0) {
         this.player.takeDamage(Math.abs(delta));
+        if (this.battleScene) {
+          this.battleScene.playHeroHurt(0, `${delta} HP`);
+        }
       } else {
         this.player.heal(delta);
+        if (this.battleScene) {
+          this.battleScene.playHeal(0, `+${delta} HP`);
+        }
       }
       this.renderPlayerSheet();
       cleanText = cleanText.replace(hpMatch[0], '');
@@ -629,6 +659,13 @@ class GameApp {
 
     sound.playClick();
     const actionData = this.party.executeAction(compId);
+
+    // Trigger Companion skill animation on scene banner
+    if (this.battleScene) {
+      const allComps = this.party.getAll();
+      const compIdx = allComps.findIndex(c => c.id === compId);
+      this.battleScene.playSkill(compIdx >= 0 ? compIdx + 1 : 1, comp.signatureMove.name);
+    }
 
     const compMsg = {
       id: `msg-${Date.now()}`,
@@ -1075,6 +1112,9 @@ class GameApp {
         this.renderPlayerSheet();
         if (result.success) {
           this.appendSystemNotice(`Người chơi đã sử dụng đan dược: ${result.msg}`);
+          if (this.battleScene) {
+            this.battleScene.playHeal(0, '+HP HỒI MÁU');
+          }
         }
       }
     });
@@ -1090,6 +1130,9 @@ class GameApp {
         if (this.player.spendQi(skill.qiCost)) {
           this.showToast(`Đã thi triển ${skill.name}! (Tiêu hao ${skill.qiCost} Qi)`);
           this.renderPlayerSheet();
+          if (this.battleScene) {
+            this.battleScene.playSkill(0, skill.name);
+          }
           this.handleUserAction(`Ta vận chuyển toàn bộ chân khí, thi triển tuyệt kỹ "${skill.name}"! (${skill.desc})`);
         } else {
           this.showToast('Không đủ Chân Khí (Qi) để thi triển!');
@@ -1107,7 +1150,24 @@ class GameApp {
     });
     document.getElementById('btn-party-banter').addEventListener('click', () => this.triggerPartyBanter());
 
-    // 11. Trigger Character Creation Buttons
+    // 11. Scene Battle Animation Control Buttons
+    document.getElementById('btn-anim-attack')?.addEventListener('click', () => {
+      if (this.battleScene) this.battleScene.playAttack(0);
+    });
+    document.getElementById('btn-anim-skill')?.addEventListener('click', () => {
+      if (this.battleScene) {
+        const heroSkill = (this.player && this.player.skills[0]) ? this.player.skills[0].name : 'Vạn Kiếm Quy Tông';
+        this.battleScene.playSkill(0, heroSkill);
+      }
+    });
+    document.getElementById('btn-anim-heal')?.addEventListener('click', () => {
+      if (this.battleScene) this.battleScene.playHeal(-1, '+HP HỒI XUÂN');
+    });
+    document.getElementById('btn-anim-monster')?.addEventListener('click', () => {
+      if (this.battleScene) this.battleScene.playMonsterAttack();
+    });
+
+    // 12. Trigger Character Creation Buttons
     document.getElementById('btn-new-character')?.addEventListener('click', () => this.openCharacterCreationWizard(false));
     document.getElementById('btn-trigger-char-create')?.addEventListener('click', () => this.openCharacterCreationWizard(true));
 
