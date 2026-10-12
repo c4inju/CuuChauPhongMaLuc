@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+
+# Environment variables & secrets
+.env
+.env.local
+*.local
+
+# System & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs & temp files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Game saves & exports (optional user files)
+cuu-chau-dnd-save-*.json

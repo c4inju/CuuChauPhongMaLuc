@@ -241,18 +241,52 @@ class GameApp {
   }
 
   renderParty() {
-    this.party.getAll().forEach(c => {
-      const hpEl = document.getElementById(`hp-${c.id}`);
-      const barEl = document.getElementById(`bar-${c.id}`);
-      if (hpEl) hpEl.textContent = `${c.hp}/${c.maxHp}`;
-      if (barEl) {
-        const pct = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
-        barEl.style.width = `${pct}%`;
-      }
+    const list = document.getElementById('party-list');
+    if (!list || !this.party) return;
+
+    const comps = this.party.getAll();
+    list.innerHTML = comps.map(c => `
+      <div class="companion-card" id="companion-${c.id}">
+        <div class="companion-top">
+          <div class="companion-avatar-wrap">
+            <canvas id="avatar-${c.id}" width="40" height="40"></canvas>
+          </div>
+          <div class="companion-info">
+            <div class="comp-name-row">
+              <span class="comp-name">${c.name.toUpperCase()}</span>
+              <span class="comp-class">${c.class}</span>
+            </div>
+            <div class="comp-personality">"${c.quote}"</div>
+          </div>
+        </div>
+        <div class="comp-stats-row">
+          <div class="comp-hp-wrap">
+            <span class="comp-hp-label">HP: <span id="hp-${c.id}">${c.hp}/${c.maxHp}</span></span>
+            <div class="pixel-progress-bar mini-bar">
+              <div class="bar-fill hp-bar-fill" id="bar-${c.id}" style="width: ${Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100))}%;"></div>
+            </div>
+          </div>
+          <button class="mini-action-btn" data-companion="${c.id}" title="${c.signatureMove.name}: ${c.signatureMove.desc}">
+            ⚔️ ${c.signatureMove.name.split('(')[0].trim()}
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    // Draw pixel avatars on canvases
+    comps.forEach(c => {
       const canvas = document.getElementById(`avatar-${c.id}`);
       if (canvas) {
-        PixelRenderer.drawAvatar(canvas, c.avatarId);
+        PixelRenderer.drawAvatar(canvas, c.avatarId || 'lanh-han');
       }
+    });
+
+    // Re-bind action button click events
+    list.querySelectorAll('.mini-action-btn').forEach(btn => {
+      btn.onclick = () => {
+        const compId = btn.getAttribute('data-companion');
+        this.triggerCompanionAction(compId);
+      };
     });
   }
 
@@ -396,6 +430,7 @@ class GameApp {
         playerHp: this.player.hp,
         playerQi: this.player.qi,
         campaign: this.currentCampaign,
+        activeParty: this.party ? this.party.getAll().map(c => `${c.name} (${c.class})`).join(', ') : 'Lãnh Hàn, Thanh Vân, Dạ Nguyệt',
         chronicleMemory: this.chronicle ? this.chronicle.getDenseMemoryPrompt() : ''
       };
 
@@ -897,8 +932,9 @@ class GameApp {
       this.showToast(`✨ Bắt đầu chiến dịch: ${selectedCamp.title}!`);
       sound.playCritSuccess();
 
-      // Initiate tailored opening story with Dungeon Master based on chosen campaign
-      const openingPrompt = `Ta là ${this.player.name}, truyền nhân môn phái ${this.player.className}, xuất thân ${this.player.backgroundName}. Cùng với ba vị đồng đạo Lãnh Hàn, Thanh Vân và Dạ Nguyệt, ta chính thức bước vào chiến dịch "${selectedCamp.title}" (${selectedCamp.chapterName}). Bối cảnh: "${selectedCamp.hook}". Mục tiêu chính: "${selectedCamp.mainObjective}". Xin Quản trò (DM) hãy mô tả khởi đầu câu chuyện và đưa ra thử thách xúc xắc đầu tiên!`;
+      // Initiate tailored opening story with Dungeon Master based on chosen campaign & party
+      const compNames = this.party ? this.party.getAll().map(c => c.name).join(', ') : 'Lãnh Hàn, Thanh Vân, Dạ Nguyệt';
+      const openingPrompt = `Ta là ${this.player.name}, truyền nhân môn phái ${this.player.className}, xuất thân ${this.player.backgroundName}. Cùng với ba vị đồng đạo ${compNames}, ta chính thức bước vào chiến dịch "${selectedCamp.title}" (${selectedCamp.chapterName}). Bối cảnh: "${selectedCamp.hook}". Mục tiêu chính: "${selectedCamp.mainObjective}". Xin Quản trò (DM) hãy mô tả khởi đầu câu chuyện và đưa ra thử thách xúc xắc đầu tiên!`;
       this.handleUserAction(openingPrompt);
     };
 
@@ -1239,6 +1275,104 @@ class GameApp {
       });
     });
 
+    // Open Party Management Modal
+    document.getElementById('btn-manage-party')?.addEventListener('click', () => {
+      this.openPartyModal();
+    });
+
+    // Generate Random Companion
+    document.getElementById('btn-gen-random-comp')?.addEventListener('click', () => {
+      if (!this.party) return;
+      sound.playDiceRoll();
+      const comp = this.party.addRandomCompanion();
+      this.renderPartyModalRoster();
+      this.showToast(`🎲 Đã chiêu mộ ngẫu nhiên: ${comp.name} (${comp.class})!`);
+    });
+
+    // Toggle Custom Companion Form
+    document.getElementById('btn-toggle-custom-form')?.addEventListener('click', () => {
+      sound.playClick();
+      const form = document.getElementById('custom-companion-form');
+      form?.classList.toggle('hidden');
+    });
+
+    document.getElementById('btn-cancel-custom-comp')?.addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('custom-companion-form')?.classList.add('hidden');
+    });
+
+    // Save Custom Companion
+    document.getElementById('btn-save-custom-comp')?.addEventListener('click', () => {
+      sound.playClick();
+      const name = document.getElementById('new-comp-name')?.value.trim();
+      const title = document.getElementById('new-comp-title')?.value.trim() || 'Giang Hồ Hiệp Sĩ';
+      const cls = document.getElementById('new-comp-class')?.value || 'Kiếm Khách';
+      const av = document.getElementById('new-comp-avatar')?.value || 'kiem-khach';
+      const move = document.getElementById('new-comp-move')?.value.trim() || 'Tuyệt Kỹ Gia Truyền';
+      const formula = document.getElementById('new-comp-formula')?.value.trim() || '1d10+3';
+      const quote = document.getElementById('new-comp-quote')?.value.trim() || 'Ta vì nghĩa hiệp mà đến.';
+
+      if (!name) {
+        this.showToast('Vui lòng nhập họ tên cho đồng đội mới!');
+        return;
+      }
+
+      const newComp = {
+        id: `custom-comp-${Date.now()}`,
+        name,
+        title,
+        class: cls,
+        avatarId: av,
+        maxHp: 26,
+        hp: 26,
+        stats: { STR: 14, AGI: 14, CON: 14, INT: 12, WIS: 12, CHA: 10 },
+        quote,
+        signatureMove: {
+          name: move,
+          dice: formula,
+          desc: `${name} thi triển ${move} uy lực phi phàm!`
+        },
+        banterResponses: [
+          `Có ${name} ta ở đây, chư vị cứ yên tâm tiến bước.`,
+          `Thế trận có biến, hãy cẩn thận phía sau!`,
+          `Một đòn vừa rồi... quả là mở rộng tầm mắt!`
+        ]
+      };
+
+      this.party.addCompanion(newComp);
+      if (this.tempSelectedParty && this.tempSelectedParty.length < 3) {
+        this.tempSelectedParty.push(newComp.id);
+      }
+      this.renderPartyModalRoster();
+      document.getElementById('custom-companion-form')?.classList.add('hidden');
+      sound.playSuccess();
+      this.showToast(`✨ Đã thêm ${name} vào danh sách đồng đội!`);
+
+      // Reset form fields
+      if (document.getElementById('new-comp-name')) document.getElementById('new-comp-name').value = '';
+      if (document.getElementById('new-comp-title')) document.getElementById('new-comp-title').value = '';
+      if (document.getElementById('new-comp-move')) document.getElementById('new-comp-move').value = '';
+      if (document.getElementById('new-comp-formula')) document.getElementById('new-comp-formula').value = '';
+      if (document.getElementById('new-comp-quote')) document.getElementById('new-comp-quote').value = '';
+    });
+
+    // Save Party Selection Button
+    document.getElementById('btn-save-party-selection')?.addEventListener('click', () => {
+      sound.playClick();
+      if (!this.tempSelectedParty || this.tempSelectedParty.length !== 3) {
+        this.showToast('Vui lòng chọn đúng 3 đồng đội xuất trận!');
+        return;
+      }
+
+      this.party.setActiveParty(this.tempSelectedParty);
+      this.renderParty();
+      GameStorage.save(this);
+      document.getElementById('modal-party-manage')?.classList.add('hidden');
+      sound.playCritSuccess();
+      const compNames = this.party.getAll().map(c => c.name).join(', ');
+      this.showToast(`Đội hình xuất trận mới: ${compNames}!`);
+    });
+
     // Universal Close Modal buttons
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1250,6 +1384,93 @@ class GameApp {
         }
         document.getElementById(targetId)?.classList.add('hidden');
       });
+    });
+  }
+
+  openPartyModal() {
+    if (!this.party) return;
+    sound.playClick();
+    this.tempSelectedParty = [...this.party.activeIds];
+    this.renderPartyModalRoster();
+    document.getElementById('custom-companion-form')?.classList.add('hidden');
+    document.getElementById('modal-party-manage')?.classList.remove('hidden');
+  }
+
+  renderPartyModalRoster() {
+    const list = document.getElementById('party-roster-list');
+    const countEl = document.getElementById('party-selected-count');
+    if (!list || !this.party) return;
+
+    if (countEl) {
+      countEl.textContent = `${this.tempSelectedParty.length} / 3 Người`;
+      countEl.style.color = this.tempSelectedParty.length === 3 ? 'var(--gold-accent)' : 'var(--red-crimson)';
+    }
+
+    const roster = this.party.getFullRoster();
+    list.innerHTML = roster.map(comp => {
+      const isSelected = this.tempSelectedParty.includes(comp.id);
+      return `
+        <div class="roster-card ${isSelected ? 'active' : ''}" data-id="${comp.id}">
+          <div class="roster-card-top">
+            <canvas class="roster-avatar-canvas" id="roster-av-${comp.id}" width="40" height="40"></canvas>
+            <div class="roster-info">
+              <div class="roster-name">${comp.name}</div>
+              <div class="roster-class">${comp.class} • ${comp.title}</div>
+              <div class="roster-title">"${comp.quote}"</div>
+            </div>
+          </div>
+          <div class="roster-move">
+            ⚡ <strong>${comp.signatureMove.name}:</strong> ${comp.signatureMove.dice}
+          </div>
+          <div class="roster-stats-row">
+            <span>STR ${comp.stats.STR}</span>
+            <span>AGI ${comp.stats.AGI}</span>
+            <span>CON ${comp.stats.CON}</span>
+            <span>INT ${comp.stats.INT}</span>
+            <span>WIS ${comp.stats.WIS}</span>
+            <span>CHA ${comp.stats.CHA}</span>
+          </div>
+          <div class="roster-card-bottom">
+            <span style="font-size: 10px; color: ${isSelected ? 'var(--gold-accent)' : 'var(--text-muted)'};">
+              ${isSelected ? '★ ĐANG XUẤT TRẬN' : 'Dự bị'}
+            </span>
+            <button type="button" class="btn-toggle-active-party ${isSelected ? 'selected' : ''}" data-id="${comp.id}">
+              ${isSelected ? '✔ ĐÃ CHỌN' : '+ CHỌN'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Draw avatars on canvases
+    roster.forEach(comp => {
+      const cv = document.getElementById(`roster-av-${comp.id}`);
+      if (cv) {
+        PixelRenderer.drawAvatar(cv, comp.avatarId || 'lanh-han');
+      }
+    });
+
+    // Bind selection toggle buttons
+    list.querySelectorAll('.btn-toggle-active-party').forEach(btn => {
+      btn.onclick = () => {
+        sound.playClick();
+        const compId = btn.getAttribute('data-id');
+        const idx = this.tempSelectedParty.indexOf(compId);
+        if (idx !== -1) {
+          if (this.tempSelectedParty.length <= 1) {
+            this.showToast('Phải giữ lại ít nhất 1 đồng đội xuất trận!');
+            return;
+          }
+          this.tempSelectedParty.splice(idx, 1);
+        } else {
+          if (this.tempSelectedParty.length >= 3) {
+            this.showToast('Đã đủ 3 đồng đội xuất trận! Hãy bỏ bớt 1 người để thay thế.');
+            return;
+          }
+          this.tempSelectedParty.push(compId);
+        }
+        this.renderPartyModalRoster();
+      };
     });
   }
 

@@ -121,7 +121,7 @@ export class NineRouterClient {
     const formattedMessages = [
       {
         role: 'system',
-        content: `${DM_SYSTEM_PROMPT}\n\n[THÔNG TIN NHÂN VẬT]:\n- Tên: ${contextInfo.playerName || 'Vô Danh'}\n- Hệ/Lớp: ${contextInfo.playerClass || 'Kiếm Khách'}\n- Xuất Thân: ${contextInfo.playerBackground || 'Tán Tu Tự Do'}\n- Cảnh Giới: ${contextInfo.playerRealm || 'Luyện Khí Tầng 1'}\n- Khí Huyết (HP): ${contextInfo.playerHp || 20}\n- Chân Khí (Qi): ${contextInfo.playerQi || 14}\n- Đồng đội: Lãnh Hàn (Kiếm Khách), Thanh Vân (Đạo Sĩ), Dạ Nguyệt (Thích Khách).\n\n${contextInfo.chronicleMemory || ''}`
+        content: `${DM_SYSTEM_PROMPT}\n\n[THÔNG TIN NHÂN VẬT]:\n- Tên: ${contextInfo.playerName || 'Vô Danh'}\n- Hệ/Lớp: ${contextInfo.playerClass || 'Kiếm Khách'}\n- Xuất Thân: ${contextInfo.playerBackground || 'Tán Tu Tự Do'}\n- Cảnh Giới: ${contextInfo.playerRealm || 'Luyện Khí Tầng 1'}\n- Khí Huyết (HP): ${contextInfo.playerHp || 20}\n- Chân Khí (Qi): ${contextInfo.playerQi || 14}\n- Đồng đội đồng hành: ${contextInfo.activeParty || 'Lãnh Hàn (Kiếm Khách), Thanh Vân (Đạo Sĩ), Dạ Nguyệt (Thích Khách)'}.\n\n${contextInfo.chronicleMemory || ''}`
       },
       ...conversationHistory.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'assistant',

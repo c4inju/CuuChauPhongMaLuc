@@ -323,90 +323,14 @@
         <div class="box-header">
           <span class="header-icon">👥</span>
           <h2>ĐỒNG ĐỘI ĐỒNG HÀNH (AI)</h2>
-          <button id="btn-party-banter" class="mini-pixel-btn" title="Kích hoạt trò chuyện ngẫu nhiên của nhóm">TRÒ CHUYỆN</button>
+          <div style="display: flex; gap: 4px;">
+            <button id="btn-manage-party" class="mini-pixel-btn" title="Tùy chỉnh & chọn đồng đội">⚙️ ĐỔI PARTY</button>
+            <button id="btn-party-banter" class="mini-pixel-btn" title="Kích hoạt trò chuyện ngẫu nhiên của nhóm">TRÒ CHUYỆN</button>
+          </div>
         </div>
 
         <div class="party-members-list" id="party-list">
-          <!-- Companion 1: Lãnh Hàn (Kiếm Khách) -->
-          <div class="companion-card" id="companion-lanh-han">
-            <div class="companion-top">
-              <div class="companion-avatar-wrap">
-                <canvas id="avatar-lanh-han" width="40" height="40"></canvas>
-              </div>
-              <div class="companion-info">
-                <div class="comp-name-row">
-                  <span class="comp-name">LÃNH HÀN</span>
-                  <span class="comp-class">Kiếm Khách</span>
-                </div>
-                <div class="comp-personality">"Kiếm chưa thấy máu, chưa thể tra vào bao."</div>
-              </div>
-            </div>
-            <div class="comp-stats-row">
-              <div class="comp-hp-wrap">
-                <span class="comp-hp-label">HP: <span id="hp-lanh-han">28/28</span></span>
-                <div class="pixel-progress-bar mini-bar">
-                  <div class="bar-fill hp-bar-fill" id="bar-lanh-han" style="width: 100%;"></div>
-                </div>
-              </div>
-              <button class="mini-action-btn" data-companion="lanh-han" title="Nhờ Lãnh Hàn ra chiêu phong tỏa">
-                ⚔️ Xuất Chiêu
-              </button>
-            </div>
-          </div>
-
-          <!-- Companion 2: Thanh Vân (Đạo Sĩ) -->
-          <div class="companion-card" id="companion-thanh-van">
-            <div class="companion-top">
-              <div class="companion-avatar-wrap">
-                <canvas id="avatar-thanh-van" width="40" height="40"></canvas>
-              </div>
-              <div class="companion-info">
-                <div class="comp-name-row">
-                  <span class="comp-name">THANH VÂN</span>
-                  <span class="comp-class">Đạo Sĩ Mao Sơn</span>
-                </div>
-                <div class="comp-personality">"Vạn vật tuần hoàn, chớ manh động phạm nghiệp."</div>
-              </div>
-            </div>
-            <div class="comp-stats-row">
-              <div class="comp-hp-wrap">
-                <span class="comp-hp-label">HP: <span id="hp-thanh-van">22/22</span></span>
-                <div class="pixel-progress-bar mini-bar">
-                  <div class="bar-fill hp-bar-fill" id="bar-thanh-van" style="width: 100%;"></div>
-                </div>
-              </div>
-              <button class="mini-action-btn" data-companion="thanh-van" title="Nhờ Thanh Vân dùng bùa hộ mệnh/trừ tà">
-                📜 Niệm Phù
-              </button>
-            </div>
-          </div>
-
-          <!-- Companion 3: Dạ Nguyệt (Thuật Sĩ / Ám Tinh) -->
-          <div class="companion-card" id="companion-da-nguyet">
-            <div class="companion-top">
-              <div class="companion-avatar-wrap">
-                <canvas id="avatar-da-nguyet" width="40" height="40"></canvas>
-              </div>
-              <div class="companion-info">
-                <div class="comp-name-row">
-                  <span class="comp-name">DẠ NGUYỆT</span>
-                  <span class="comp-class">Ám Tinh Thích Khách</span>
-                </div>
-                <div class="comp-personality">"Trong bóng tối, sơ hở của ngươi là mạng sống."</div>
-              </div>
-            </div>
-            <div class="comp-stats-row">
-              <div class="comp-hp-wrap">
-                <span class="comp-hp-label">HP: <span id="hp-da-nguyet">24/24</span></span>
-                <div class="pixel-progress-bar mini-bar">
-                  <div class="bar-fill hp-bar-fill" id="bar-da-nguyet" style="width: 100%;"></div>
-                </div>
-              </div>
-              <button class="mini-action-btn" data-companion="da-nguyet" title="Nhờ Dạ Nguyệt do thám sơ hở / ám kích">
-                🗡️ Ám Kích
-              </button>
-            </div>
-          </div>
+          <!-- Dynamically populated by JS renderParty() -->
         </div>
       </div>
 
@@ -895,6 +819,103 @@
 
       <div class="modal-footer">
         <button class="pixel-btn secondary-btn" data-close="modal-chronicle">ĐÓNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Party Customization & Selection Manager -->
+  <div id="modal-party-manage" class="modal-backdrop hidden">
+    <div class="modal-dialog pixel-box modal-lg">
+      <div class="box-header">
+        <span class="header-icon">👥</span>
+        <h2>QUẢN LÝ & TÙY BIẾN ĐỒNG ĐỘI GIANG HỒ</h2>
+        <button class="modal-close-btn" data-close="modal-party-manage">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Top Status Bar & Action Buttons -->
+        <div class="party-manage-topbar">
+          <div class="party-status-indicator">
+            <span>ĐỘI HÌNH XUẤT TRẬN:</span>
+            <strong id="party-selected-count" style="color: var(--gold-accent);">3 / 3 Người</strong>
+          </div>
+          <div class="party-top-actions">
+            <button type="button" id="btn-gen-random-comp" class="pixel-btn secondary-btn">
+              🎲 TẠO NGẪU NHIÊN ĐỒNG ĐỘI
+            </button>
+            <button type="button" id="btn-toggle-custom-form" class="pixel-btn primary-btn">
+              ✨ TỰ THIẾT KẾ ĐỒNG ĐỘI
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Custom Companion Creator Form -->
+        <div id="custom-companion-form" class="custom-comp-container hidden">
+          <div class="custom-comp-box pixel-box">
+            <h3 class="custom-form-title">🥋 THIẾT KẾ ĐỒNG ĐỘI MỚI</h3>
+            <div class="custom-form-grid">
+              <div class="form-group">
+                <label for="new-comp-name">HỌ TÊN:</label>
+                <input type="text" id="new-comp-name" class="pixel-input" placeholder="Ví dụ: Lạc Vô Trần" maxlength="20">
+              </div>
+              <div class="form-group">
+                <label for="new-comp-title">DANH HIỆU / BIỆT DANH:</label>
+                <input type="text" id="new-comp-title" class="pixel-input" placeholder="Ví dụ: Thần Phong Kiếm Khách" maxlength="30">
+              </div>
+              <div class="form-group">
+                <label for="new-comp-class">HỆ LỚP:</label>
+                <select id="new-comp-class" class="pixel-select">
+                  <option value="Kiếm Khách">Kiếm Khách (Tấn công d10)</option>
+                  <option value="Đạo Sĩ">Đạo Sĩ Trận Pháp (Hồi phục / Trừ tà d8)</option>
+                  <option value="Thích Khách">Thích Khách Ám Kích (Bạo kích d8)</option>
+                  <option value="Thể Tu">Thể Tu Khí Công (Đỡ đòn d12)</option>
+                  <option value="Hàn Sĩ">Hàn Sĩ Đan Đạo (Hỗ trợ / Buff d8)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="new-comp-avatar">AVATAR PIXEL:</label>
+                <select id="new-comp-avatar" class="pixel-select">
+                  <option value="kiem-khach">Kiếm Khách (Nam hiệp)</option>
+                  <option value="tu-si">Tu Sĩ (Kim Cang)</option>
+                  <option value="am-duong-su">Âm Dương Sư (Đạo bào)</option>
+                  <option value="han-si">Hàn Sĩ (Trang nhã)</option>
+                  <option value="thich-khach">Thích Khách (Hắc y)</option>
+                  <option value="da-nguyet">Dạ Nguyệt (Nữ hiệp)</option>
+                  <option value="thanh-van">Thanh Vân (Đạo trưởng)</option>
+                  <option value="lanh-han">Lãnh Hàn (Băng kiếm)</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label for="new-comp-move">TÊN TUYỆT KỸ & MÔ TẢ CHIÊU THỨC:</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="new-comp-move" class="pixel-input" placeholder="Tên chiêu (Ví dụ: Cửu Tiêu Kiếm Vũ)" style="flex: 1;">
+                  <input type="text" id="new-comp-formula" class="pixel-input" placeholder="Công thức (vd: 1d10+3)" style="width: 140px;">
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label for="new-comp-quote">CÂU CHÂM NGÔN / TÍNH CÁCH:</label>
+                <input type="text" id="new-comp-quote" class="pixel-input" placeholder="Ví dụ: 'Một tấc kiếm, một tấc sinh tử.'">
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+              <button type="button" id="btn-cancel-custom-comp" class="pixel-btn secondary-btn">HỦY</button>
+              <button type="button" id="btn-save-custom-comp" class="pixel-btn primary-btn">➕ THÊM VÀO KHO ĐỒNG ĐỘI</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Roster Grid (All Companions) -->
+        <h4 style="font-size: 11px; color: var(--gold-accent); margin: 10px 0 6px 0;">DANH SÁCH ĐỒNG ĐỘI TRONG KHO (CHỌN ĐÚNG 3 NGƯỜI XUẤT TRẬN):</h4>
+        <div class="party-roster-grid" id="party-roster-list">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-save-party-selection" class="pixel-btn primary-btn large-btn">
+          💾 LƯU ĐỘI HÌNH XUẤT TRẬN
+        </button>
+        <button class="pixel-btn secondary-btn" data-close="modal-party-manage">ĐÓNG</button>
       </div>
     </div>
   </div>
