@@ -1,0 +1,237 @@
+/* ==========================================================================
+   DICE-ROLLER.CSS - Interactive 2D/3D Dice Roller Tray & Dice Mechanics
+   ========================================================================== */
+
+.dice-box {
+  background-color: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+.dice-badge {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-gold-dark);
+  color: var(--gold-accent);
+  padding: 2px 6px;
+}
+
+/* Dice Tray Canvas & Result */
+.dice-tray-area {
+  position: relative;
+  height: 125px;
+  background-color: #080a10;
+  border-bottom: 2px solid var(--border-light);
+  overflow: hidden;
+}
+
+#dice-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.dice-result-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(14, 18, 29, 0.45) 0%, rgba(8, 10, 16, 0.8) 100%);
+}
+
+.big-result {
+  font-family: var(--font-pixel);
+  font-size: 32px;
+  color: var(--gold-primary);
+  text-shadow: 3px 3px 0px #000, 0 0 12px rgba(246, 201, 68, 0.8);
+  line-height: 1;
+  margin-bottom: 4px;
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.big-result.pop {
+  transform: scale(1.35);
+}
+
+.result-formula {
+  font-family: var(--font-retro);
+  font-size: 15px;
+  color: #cbd5e1;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0px #000;
+  margin-bottom: 4px;
+}
+
+.verdict-tag {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 2px 6px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+.verdict-tag.crit-success {
+  background: rgba(246, 201, 68, 0.2);
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  box-shadow: 0 0 8px rgba(246, 201, 68, 0.6);
+}
+
+.verdict-tag.success {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--green-jade);
+  color: var(--green-light);
+}
+
+.verdict-tag.fail {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: var(--red-crimson);
+  color: #fca5a5;
+}
+
+.verdict-tag.crit-fail {
+  background: rgba(220, 38, 38, 0.4);
+  border-color: var(--red-dark);
+  color: #fee2e2;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+
+/* Dice Selection Grid */
+.dice-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dice-select-btn {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 6px 0;
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.dice-select-btn:hover {
+  border-color: var(--gold-accent);
+  color: var(--text-main);
+}
+
+.dice-select-btn.active {
+  background: var(--border-gold-dark);
+  border-color: var(--gold-accent);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(246, 201, 68, 0.4);
+}
+
+/* Modifier Row */
+.modifier-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  align-items: flex-end;
+}
+
+.mod-selector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mod-selector label, .mod-custom label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-muted);
+}
+
+.mod-selector select {
+  width: 100%;
+}
+
+.mod-custom {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mod-custom input {
+  width: 100%;
+  text-align: center;
+}
+
+/* Roll Action Buttons */
+.roll-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 10px 8px 10px;
+}
+
+.roll-main-btn {
+  font-size: 10px;
+  padding: 9px 0;
+}
+
+.roll-action-buttons button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Dice History */
+.dice-history-section {
+  padding: 6px 10px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.history-title {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.history-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 52px;
+  overflow-y: auto;
+}
+
+.hist-tag {
+  font-family: var(--font-retro);
+  font-size: 13px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 1px 6px;
+  color: var(--text-muted);
+  border-radius: 2px;
+}
+
+.hist-tag.success {
+  border-color: var(--green-jade);
+  color: var(--green-light);
+}
+
+.hist-tag.fail {
+  border-color: var(--red-crimson);
+  color: #fca5a5;
+}

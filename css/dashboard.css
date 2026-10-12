@@ -1,0 +1,889 @@
+/* ==========================================================================
+   DASHBOARD.CSS - 3-Column Layout & Game Interaction Styles
+   ========================================================================== */
+
+/* Header */
+.retro-header {
+  height: 56px;
+  background-color: var(--bg-panel);
+  border-bottom: 3px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left .game-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pixel-icon-dragon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 6px rgba(246, 201, 68, 0.8));
+}
+
+.pixel-title {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: var(--gold-primary);
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px #000;
+  margin: 0;
+}
+
+.logo-sub {
+  font-family: var(--font-retro);
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  display: block;
+  line-height: 1;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.campaign-badge, .turn-counter {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+}
+
+.badge-label {
+  color: var(--text-muted);
+}
+
+.badge-val {
+  color: var(--gold-accent);
+}
+
+.header-right .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   3-COLUMN DASHBOARD GRID
+   ========================================================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 310px 1fr 340px;
+  gap: 12px;
+  padding: 12px;
+  height: calc(100vh - 56px);
+  max-width: 1920px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.dashboard-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   CỘT TRÁI: NHÂN VẬT NGƯỜI CHƠI
+   ========================================================================== */
+
+.col-left {
+  background-color: var(--bg-panel);
+}
+
+.character-card-container {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.char-hero-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-panel-light);
+  padding: 10px;
+  border: 2px solid var(--border-light);
+}
+
+.pixel-avatar-frame {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--border-gold);
+  background: #000;
+  box-shadow: 2px 2px 0px #000;
+  flex-shrink: 0;
+}
+
+.pixel-avatar-frame canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.char-level-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: var(--border-gold-dark);
+  color: #fff;
+  border: 1px solid var(--border-gold);
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 1px 4px;
+  box-shadow: 1px 1px 0px #000;
+}
+
+.char-title-block {
+  overflow: hidden;
+}
+
+.char-name {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--gold-primary);
+  text-shadow: 1px 1px 0px #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.char-class-badge {
+  display: inline-block;
+  background: #1e3a8a;
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  margin-bottom: 4px;
+}
+
+.cultivation-realm {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Vital Bars */
+.vital-bars-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-panel-light);
+  padding: 10px;
+  border: 1px solid var(--border-light);
+}
+
+.bar-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.vital-title {
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+}
+
+.vital-value {
+  font-family: var(--font-retro);
+  font-size: 14px;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+/* Stats Grid (6 Core Stats) */
+.stats-section {
+  background: var(--bg-panel-light);
+  padding: 10px;
+  border: 1px solid var(--border-light);
+}
+
+.section-title-sm {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.stat-card {
+  background: var(--bg-dark);
+  border: 2px solid var(--border-light);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-1px);
+}
+
+.stat-label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.stat-score {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+.stat-mod {
+  font-family: var(--font-retro);
+  font-size: 16px;
+  color: var(--gold-accent);
+  font-weight: bold;
+}
+
+.stat-roll-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.stat-card:hover .stat-roll-btn {
+  opacity: 1;
+}
+
+/* Tabs: Inventory, Equipment, Skills */
+.char-tabs-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel-light);
+  min-height: 180px;
+}
+
+.pixel-tab-headers {
+  display: flex;
+  border-bottom: 2px solid var(--border-light);
+  background: var(--bg-dark);
+}
+
+.tab-btn {
+  flex: 1;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-right: 1px solid var(--border-light);
+}
+
+.tab-btn:last-child {
+  border-right: none;
+}
+
+.tab-btn.active {
+  background: var(--bg-panel-light);
+  color: var(--gold-accent);
+  border-bottom: 2px solid var(--gold-accent);
+}
+
+.tab-contents {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.tab-pane {
+  display: none;
+  height: 100%;
+}
+
+.tab-pane.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed var(--border-light);
+  font-size: 11px;
+  color: var(--gold-accent);
+}
+
+.pixel-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inventory-item-card, .skill-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.item-left, .skill-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name, .skill-name {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-main);
+}
+
+.item-desc, .skill-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.equip-slot {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  margin-bottom: 6px;
+}
+
+.slot-name {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+  margin-bottom: 2px;
+}
+
+.slot-item {
+  font-size: 11px;
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   CỘT GIỮA: KHUNG HỘI THOẠI & KỂ CHUYỆN (CHÍNH)
+   ========================================================================== */
+
+.col-center {
+  background-color: var(--bg-panel);
+}
+
+.scene-banner-container {
+  height: 130px;
+  border-bottom: 3px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+}
+
+#scene-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scene-overlay-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(0deg, rgba(10, 12, 19, 0.95) 0%, rgba(10, 12, 19, 0.6) 70%, transparent 100%);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.scene-badge {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--gold-primary);
+  text-shadow: 2px 2px 0px #000;
+}
+
+.scene-atmosphere {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* DC Challenge Notification Alert */
+.dc-challenge-box {
+  background: linear-gradient(180deg, #3b1010 0%, #1f0b0b 100%);
+  border: 2px solid var(--red-crimson);
+  margin: 10px 12px 0 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4), var(--shadow-pixel);
+  animation: dc-attention 1.5s infinite alternate;
+}
+
+@keyframes dc-attention {
+  0% { border-color: var(--red-crimson); }
+  100% { border-color: var(--gold-accent); }
+}
+
+.dc-challenge-box.hidden {
+  display: none;
+}
+
+.dc-challenge-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dc-title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--gold-accent);
+}
+
+.dc-challenge-body {
+  flex: 1;
+}
+
+#dc-challenge-desc {
+  font-size: 12px;
+  color: #fecaca;
+  margin-bottom: 4px;
+}
+
+.dc-challenge-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+}
+
+.dc-target strong {
+  color: var(--gold-primary);
+  font-family: var(--font-retro);
+  font-size: 16px;
+}
+
+.dc-stat-req strong {
+  color: var(--blue-azure);
+}
+
+/* Story Narrative Feed */
+.story-feed-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Message Bubble Varieties */
+.story-message {
+  border: 2px solid var(--border-light);
+  padding: 10px 14px;
+  position: relative;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  line-height: 1.6;
+}
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.msg-sender-tag {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msg-timestamp {
+  font-family: var(--font-retro);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.msg-body {
+  font-size: 13.5px;
+  white-space: pre-line;
+}
+
+/* DM Message (Dungeon Master - Gold / Amber) */
+.story-message.dm-message {
+  background-color: #17161c;
+  border-color: var(--border-gold-dark);
+  box-shadow: 0 0 10px rgba(246, 201, 68, 0.08), 2px 2px 0px #000;
+}
+
+.story-message.dm-message .msg-sender-tag {
+  color: var(--gold-accent);
+}
+
+.story-message.dm-message .msg-body {
+  color: #fef08a;
+  text-shadow: 0 0 1px rgba(0,0,0,0.8);
+}
+
+/* Player Message (Cyan / Blue) */
+.story-message.player-message {
+  background-color: #0b1a29;
+  border-color: #0284c7;
+  align-self: flex-end;
+  width: 92%;
+}
+
+.story-message.player-message .msg-sender-tag {
+  color: #38bdf8;
+}
+
+.story-message.player-message .msg-body {
+  color: #e0f2fe;
+}
+
+/* AI Companion Messages (Green, Purple, etc.) */
+.story-message.companion-message {
+  background-color: #111a1a;
+  border-color: #059669;
+}
+
+.story-message.companion-message.lanh-han {
+  border-color: #0284c7;
+  background-color: #091924;
+}
+
+.story-message.companion-message.lanh-han .msg-sender-tag {
+  color: #38bdf8;
+}
+
+.story-message.companion-message.thanh-van {
+  border-color: #9333ea;
+  background-color: #190e29;
+}
+
+.story-message.companion-message.thanh-van .msg-sender-tag {
+  color: #c084fc;
+}
+
+.story-message.companion-message.da-nguyet {
+  border-color: #db2777;
+  background-color: #260f1c;
+}
+
+.story-message.companion-message.da-nguyet .msg-sender-tag {
+  color: #f472b6;
+}
+
+/* System / Dice Roll Result Message */
+.story-message.system-message {
+  background-color: #0e111a;
+  border-color: #475569;
+  font-family: var(--font-viet);
+}
+
+.story-message.system-message .msg-sender-tag {
+  color: #94a3b8;
+}
+
+.dice-result-card {
+  background: #000;
+  border: 2px solid var(--border-light);
+  padding: 8px 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dice-result-card.success {
+  border-color: var(--green-jade);
+}
+
+.dice-result-card.crit-success {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 10px rgba(246, 201, 68, 0.5);
+}
+
+.dice-result-card.fail {
+  border-color: var(--red-crimson);
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-panel-light);
+  border-top: 1px solid var(--border-light);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+}
+
+.typing-indicator.hidden {
+  display: none;
+}
+
+.typing-indicator .dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--gold-accent);
+  animation: typing-dot 1s infinite alternate;
+}
+
+.typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-dot {
+  0% { transform: translateY(0); opacity: 0.3; }
+  100% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Quick Action Chips */
+.quick-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border-top: 2px solid var(--border-light);
+  overflow-x: auto;
+}
+
+.quick-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.chip-btn {
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.1s;
+}
+
+.chip-btn:hover {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  transform: translateY(-1px);
+}
+
+/* Action Input Container */
+.action-input-container {
+  padding: 10px 12px;
+  background: var(--bg-panel);
+  border-top: 3px solid var(--border-light);
+}
+
+.action-form {
+  display: flex;
+  gap: 8px;
+}
+
+.action-form .pixel-input {
+  flex: 1;
+}
+
+.send-btn {
+  flex-shrink: 0;
+  padding: 0 16px;
+}
+
+/* ==========================================================================
+   CỘT PHẢI: PARTY COMPANIONS + DICE ROLLER
+   ========================================================================== */
+
+.col-right {
+  gap: 12px;
+}
+
+/* Party Companions Box */
+.party-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.party-members-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.companion-card {
+  background: var(--bg-panel-light);
+  border: 2px solid var(--border-light);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.companion-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.companion-avatar-wrap {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border-light);
+  background: #000;
+  flex-shrink: 0;
+}
+
+.companion-avatar-wrap canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.companion-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.comp-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.comp-name {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--gold-primary);
+}
+
+.comp-class {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.comp-personality {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comp-hp-wrap {
+  flex: 1;
+}
+
+.comp-hp-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.mini-action-btn {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 4px 6px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mini-action-btn:hover {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 280px 1fr 300px;
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+  .dashboard-col {
+    height: 600px;
+  }
+}

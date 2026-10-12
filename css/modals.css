@@ -1,0 +1,738 @@
+/* ==========================================================================
+   MODALS.CSS - Retro Pixel Modals (9router Settings, D&D Character Creation, Save)
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(5, 7, 12, 0.85);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.modal-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-panel);
+  animation: modal-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-dialog.modal-lg {
+  max-width: 920px;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-close-btn:hover {
+  color: var(--red-crimson);
+}
+
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  border-left: 3px solid var(--border-gold);
+  padding-left: 8px;
+  margin-bottom: 4px;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  background: var(--bg-panel-light);
+  border-top: 2px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+}
+
+.form-help {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-group.half {
+  flex: 1;
+}
+
+/* Preset Chips for Model Selection */
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.preset-chip {
+  font-family: var(--font-retro);
+  font-size: 13px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.preset-chip:hover {
+  border-color: var(--gold-accent);
+  color: var(--text-main);
+}
+
+.preset-chip.active {
+  background: var(--border-gold-dark);
+  border-color: var(--gold-accent);
+  color: #fff;
+}
+
+/* Slider Controls */
+.slider-val {
+  font-family: var(--font-retro);
+  font-size: 14px;
+  color: var(--gold-accent);
+  margin-left: 6px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+  margin: 4px 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #334155;
+  border: 2px solid var(--border-light);
+  transition: 0.2s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.2s;
+}
+
+input:checked + .toggle-slider {
+  background-color: #059669;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Connection Status Box */
+.connection-status-box {
+  padding: 10px;
+  border: 2px solid var(--border-light);
+  background: var(--bg-dark);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connection-status-box.success {
+  border-color: var(--green-jade);
+  color: #6ee7b7;
+}
+
+.connection-status-box.error {
+  border-color: var(--red-crimson);
+  color: #fca5a5;
+}
+
+/* ==========================================================================
+   AUTHENTIC D&D 5E CHARACTER CREATION WIZARD
+   ========================================================================== */
+
+.create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 820px) {
+  .create-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.create-col-left, .create-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Class Picker */
+.class-picker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 190px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.class-card {
+  background: var(--bg-dark);
+  border: 2px solid var(--border-light);
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.class-card:hover {
+  border-color: var(--gold-accent);
+}
+
+.class-card.active {
+  border-color: var(--gold-accent);
+  background: #1e2538;
+  box-shadow: 0 0 8px rgba(246, 201, 68, 0.3);
+}
+
+.class-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.class-title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--gold-primary);
+}
+
+.class-hitdie {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  background: #7c2d12;
+  color: #fed7aa;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.class-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Background Picker */
+.background-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.bg-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.bg-card:hover {
+  border-color: var(--green-jade);
+}
+
+.bg-card.active {
+  border-color: var(--green-jade);
+  background: #0f241d;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
+.bg-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--green-light);
+  margin-bottom: 2px;
+}
+
+.bg-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.avatar-choices-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.avatar-choice-thumb {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border-light);
+  background: #000;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.avatar-choice-thumb.active {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 8px rgba(246, 201, 68, 0.6);
+}
+
+/* Stat Allocation Right Side */
+.stat-methods-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-dark);
+  padding: 4px;
+  border: 1px solid var(--border-light);
+}
+
+.method-btn {
+  flex: 1;
+  font-family: var(--font-pixel);
+  font-size: 7.5px;
+  padding: 5px 2px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.method-btn:hover {
+  color: var(--text-main);
+}
+
+.method-btn.active {
+  background: var(--border-gold-dark);
+  border-color: var(--gold-accent);
+  color: #fff;
+}
+
+.stat-alloc-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-dark);
+  padding: 10px;
+  border: 2px solid var(--border-light);
+}
+
+.alloc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.stat-name-tag {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--text-muted);
+  width: 100px;
+}
+
+.alloc-btn {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.alloc-btn:hover {
+  background: var(--border-gold-dark);
+}
+
+.alloc-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.alloc-val {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--gold-primary);
+  width: 24px;
+  text-align: center;
+}
+
+.alloc-bonus {
+  font-size: 10px;
+  color: var(--green-light);
+  width: 30px;
+}
+
+.alloc-mod {
+  font-family: var(--font-retro);
+  font-size: 16px;
+  color: var(--gold-accent);
+  width: 28px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.alloc-pool-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: #111420;
+  border: 1px dashed var(--border-gold-dark);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+}
+
+.create-summary-box {
+  background: var(--bg-panel-light);
+  border: 2px solid var(--border-light);
+  padding: 10px;
+  font-size: 11.5px;
+}
+
+.summary-heading {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+  margin-bottom: 6px;
+}
+
+.summary-metrics-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.metric-tag {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 3px 6px;
+  font-size: 11px;
+}
+
+.metric-tag strong {
+  color: var(--gold-primary);
+}
+
+.summary-line {
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+/* Save Management Modal */
+.save-status-info {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 10px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.file-upload-btn {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   CAMPAIGN PICKER IN CHARACTER CREATION
+   ========================================================================== */
+
+.campaign-picker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.campaign-card {
+  background: var(--bg-dark);
+  border: 2px solid var(--border-light);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.campaign-card:hover {
+  border-color: var(--gold-accent);
+  background: #1c2336;
+}
+
+.campaign-card.active {
+  border-color: var(--gold-accent);
+  background: #20283e;
+  box-shadow: 0 0 10px rgba(246, 201, 68, 0.35);
+}
+
+.camp-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.camp-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--gold-accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camp-badge-genre {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-light);
+  padding: 2px 6px;
+  color: var(--teal-accent);
+}
+
+.camp-desc {
+  font-size: 10px;
+  color: var(--text-light);
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+
+.camp-goal {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   CHRONICLE & LONG-TERM MEMORY MODAL
+   ========================================================================== */
+
+.chronicle-campaign-banner {
+  background: linear-gradient(135deg, #1c2237 0%, #111524 100%);
+  border: 2px solid var(--gold-accent);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.camp-banner-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--gold-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camp-banner-goal {
+  font-size: 11px;
+  color: #a5b4fc;
+}
+
+.chronicle-scroll {
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 6px;
+}
+
+/* Milestones Timeline Items */
+.milestone-item {
+  background: var(--bg-dark);
+  border-left: 3px solid var(--gold-accent);
+  border-top: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  padding: 8px 12px;
+  transition: all 0.15s;
+}
+
+.milestone-item:hover {
+  background: #1c2237;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.milestone-tag {
+  font-size: 10px;
+  color: var(--gold-accent);
+  font-weight: bold;
+}
+
+.milestone-time {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+.milestone-summary {
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.4;
+}
+
+/* Lorebook Items */
+.lore-item {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 8px 12px;
+}
+
+.lore-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.lore-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--teal-accent);
+}
+
+.lore-cat-tag {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-light);
+  padding: 2px 6px;
+  color: var(--text-muted);
+}
+
+.lore-desc {
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.35;
+}
+
+/* Quest Items */
+.quest-item {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-light);
+  padding: 8px 12px;
+}
+
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.quest-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--gold-accent);
+}
+
+.quest-status-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border: 1px solid var(--border-light);
+}
+
+.quest-status-tag.in_progress {
+  color: #fbbf24;
+  border-color: #fbbf24;
+}
+
+.quest-status-tag.completed {
+  color: #34d399;
+  border-color: #34d399;
+}
+
+.quest-desc {
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.35;
+}
+

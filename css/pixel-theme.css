@@ -1,0 +1,366 @@
+/* ==========================================================================
+   PIXEL-THEME.CSS - 8-Bit / 16-Bit Retro Asian Dark Fantasy D&D Theme
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg-dark: #0a0c13;
+  --bg-panel: #121624;
+  --bg-panel-light: #1b2136;
+  --bg-input: #0e121d;
+  
+  /* Borders */
+  --border-dark: #05060a;
+  --border-light: #2c3654;
+  --border-gold: #f6c944;
+  --border-gold-dark: #9e7514;
+  --border-red: #dc2626;
+  
+  /* Accents */
+  --gold-primary: #ffd166;
+  --gold-accent: #f6c944;
+  --red-crimson: #ef4444;
+  --red-dark: #991b1b;
+  --green-jade: #10b981;
+  --green-light: #34d399;
+  --blue-azure: #38bdf8;
+  --purple-spirit: #c084fc;
+  --purple-dark: #6b21a8;
+  
+  /* Text */
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-gold: #fde047;
+  
+  /* Fonts */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-retro: 'VT323', monospace;
+  --font-viet: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Shadows */
+  --shadow-pixel: 3px 3px 0px rgba(0, 0, 0, 0.7);
+  --shadow-pixel-lg: 5px 5px 0px rgba(0, 0, 0, 0.85);
+  --shadow-gold: 0 0 10px rgba(246, 201, 68, 0.4);
+}
+
+/* Base Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  image-rendering: pixelated;
+}
+
+body.pixel-theme {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-viet);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 10%, rgba(30, 27, 75, 0.35) 0%, transparent 60%),
+    linear-gradient(rgba(18, 22, 36, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 22, 36, 0.6) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+  background-position: 0 0, -1px -1px, -1px -1px;
+}
+
+/* CRT Scanline Overlay */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.18;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.5) 50%
+  ), 
+  linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  transition: opacity 0.2s ease;
+}
+
+body:not(.scanline-active) .crt-overlay {
+  display: none;
+}
+
+/* ==========================================================================
+   RETRO PIXEL BOXES & BORDERS (NES / SNES 8-Bit Frames)
+   ========================================================================== */
+
+.pixel-box {
+  background-color: var(--bg-panel);
+  position: relative;
+  border: 3px solid var(--border-light);
+  box-shadow: 
+    -3px -3px 0 0 var(--border-dark),
+    3px -3px 0 0 var(--border-dark),
+    -3px 3px 0 0 var(--border-dark),
+    3px 3px 0 0 var(--border-dark),
+    var(--shadow-pixel);
+}
+
+.box-header {
+  background-color: var(--bg-panel-light);
+  border-bottom: 2px solid var(--border-light);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.box-header h2 {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--gold-accent);
+  letter-spacing: 0.5px;
+  text-shadow: 2px 2px 0px #000;
+  flex: 1;
+}
+
+.header-icon {
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   RETRO BUTTONS
+   ========================================================================== */
+
+.pixel-btn {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 7px 12px;
+  background-color: var(--bg-panel-light);
+  color: var(--text-main);
+  border: 2px solid var(--border-light);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  text-shadow: 1px 1px 0px #000;
+  box-shadow: 2px 2px 0px var(--border-dark);
+  transition: all 0.08s ease;
+  user-select: none;
+}
+
+.pixel-btn:hover {
+  filter: brightness(1.15);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--border-dark);
+}
+
+.pixel-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--border-dark);
+}
+
+.pixel-btn.primary-btn {
+  background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+  border-color: var(--border-gold);
+  color: #fff;
+}
+
+.pixel-btn.accent-btn {
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+  border-color: #f87171;
+  color: #fff;
+}
+
+.pixel-btn.secondary-btn {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-color: #475569;
+}
+
+.pixel-btn.danger-btn {
+  background: #7f1d1d;
+  border-color: #ef4444;
+  color: #fecaca;
+}
+
+.pixel-btn.icon-btn {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.mini-pixel-btn {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 4px 6px;
+  background-color: var(--bg-dark);
+  color: var(--gold-accent);
+  border: 1px solid var(--border-gold-dark);
+  cursor: pointer;
+  box-shadow: 1px 1px 0px #000;
+}
+
+.mini-pixel-btn:hover {
+  background-color: var(--border-gold-dark);
+  color: #fff;
+}
+
+/* Pulsing Glow Animation */
+.pulse-glow {
+  animation: pixel-pulse 2s infinite ease-in-out;
+}
+
+@keyframes pixel-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(246, 201, 68, 0.3), 2px 2px 0px var(--border-dark);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(246, 201, 68, 0.7), 2px 2px 0px var(--border-dark);
+  }
+}
+
+/* ==========================================================================
+   PROGRESS BARS (HP, QI, EXP)
+   ========================================================================== */
+
+.pixel-progress-bar {
+  background-color: #0b0d14;
+  height: 12px;
+  border: 2px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.pixel-progress-bar .bar-fill {
+  height: 100%;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* HP Bar (Crimson Red) */
+.hp-bar .bar-fill {
+  background: linear-gradient(90deg, #b91c1c 0%, #ef4444 70%, #f87171 100%);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Qi Bar (Ethereal Cyan / Indigo) */
+.qi-bar .bar-fill {
+  background: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 70%, #7dd3fc 100%);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+/* EXP Bar (Jade Green / Amber) */
+.exp-bar .bar-fill {
+  background: linear-gradient(90deg, #047857 0%, #10b981 70%, #6ee7b7 100%);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.pixel-progress-bar.mini-bar {
+  height: 8px;
+}
+
+/* ==========================================================================
+   INPUTS & SELECTS
+   ========================================================================== */
+
+.pixel-input, .pixel-select, .pixel-num-input {
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  border: 2px solid var(--border-light);
+  padding: 8px 10px;
+  font-family: var(--font-viet);
+  font-size: 13px;
+  outline: none;
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.15s;
+}
+
+.pixel-input:focus, .pixel-select:focus, .pixel-num-input:focus {
+  border-color: var(--border-gold);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.6), 0 0 8px rgba(246, 201, 68, 0.3);
+}
+
+.pixel-select {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   RETRO SCROLLBARS
+   ========================================================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border: 1px solid var(--border-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-gold-dark);
+}
+
+/* ==========================================================================
+   STATUS INDICATORS & BADGES
+   ========================================================================== */
+
+.status-dot-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #64748b;
+  border: 1px solid #000;
+}
+
+.status-dot-indicator.connected {
+  background-color: var(--green-jade);
+  box-shadow: 0 0 6px var(--green-jade);
+}
+
+.status-dot-indicator.error {
+  background-color: var(--red-crimson);
+  box-shadow: 0 0 6px var(--red-crimson);
+}
+
+.status-dot-indicator.connecting {
+  background-color: var(--gold-accent);
+  box-shadow: 0 0 6px var(--gold-accent);
+}
+
+/* Toast Message */
+.retro-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-panel);
+  border: 3px solid var(--border-gold);
+  color: var(--gold-primary);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 12px 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.9), var(--shadow-pixel);
+  z-index: 10000;
+  transition: all 0.2s ease;
+}
+
+.retro-toast.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 20px);
+}

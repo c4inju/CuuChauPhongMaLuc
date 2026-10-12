@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cửu Châu Phong Ma Lục | D&D Phương Đông Pixel RPG</title>
+  
+  <!-- Retro Pixel & Asian Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐉</text></svg>">
+  <link rel="stylesheet" href="css/pixel-theme.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/dice-roller.css">
+  <link rel="stylesheet" href="css/modals.css">
+</head>
+<body class="pixel-theme scanline-active">
+  <!-- CRT Scanline Effect Overlay -->
+  <div id="crt-overlay" class="crt-overlay"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="retro-header">
+    <div class="header-left">
+      <div class="game-logo">
+        <span class="pixel-icon-dragon">🐉</span>
+        <div class="logo-text">
+          <h1 class="pixel-title">CỬU CHÂU PHONG MA LỤC</h1>
+          <span class="logo-sub">TTRPG ASIAN DARK FANTASY • D&D 5E PIXEL EDITION</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="campaign-badge">
+        <span class="badge-label">CHIẾN DỊCH:</span>
+        <span id="current-chapter-title" class="badge-val">Hồi 1: Quán Trọ Vong Hồn</span>
+      </div>
+      <div class="turn-counter">
+        <span class="badge-label">LƯỢT:</span>
+        <span id="turn-count" class="badge-val">0</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="header-actions">
+        <!-- Audio Toggle -->
+        <button id="btn-toggle-audio" class="pixel-btn icon-btn" title="Bật/Tắt Âm thanh 8-bit">
+          <span id="audio-icon">🔊</span>
+        </button>
+        <!-- CRT Toggle -->
+        <button id="btn-toggle-crt" class="pixel-btn icon-btn" title="Bật/Tắt Hiệu ứng Màn hình CRT">
+          <span>📺</span>
+        </button>
+        <!-- Save/Load Modal Trigger -->
+        <button id="btn-open-save" class="pixel-btn secondary-btn" title="Lưu/Tải tiến trình">
+          <span>💾 LƯU GAME</span>
+        </button>
+        <!-- Chronicle / Memory Journal Modal Trigger -->
+        <button id="btn-open-chronicle" class="pixel-btn secondary-btn" title="Ký ức & Biên niên sử giang hồ">
+          <span>📜 BIÊN NIÊN SỬ</span>
+        </button>
+        <!-- 9router Settings Trigger -->
+        <button id="btn-open-settings" class="pixel-btn primary-btn pulse-glow" title="Cấu hình 9router LLM">
+          <span class="status-dot-indicator connected" id="api-status-dot"></span>
+          <span>⚙️ 9ROUTER API</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Dashboard -->
+  <main class="dashboard-grid">
+    
+    <!-- ==================== CỘT TRÁI: NHÂN VẬT NGƯỜI CHƠI ==================== -->
+    <aside class="dashboard-col col-left pixel-box">
+      <div class="box-header">
+        <span class="header-icon">🥋</span>
+        <h2>TIÊN HIỆP BẢNG (NHÂN VẬT)</h2>
+        <button id="btn-new-character" class="mini-pixel-btn" title="Tạo hoặc thay đổi nhân vật">ĐỔI NV</button>
+      </div>
+
+      <!-- Placeholder when NO character is created yet -->
+      <div id="player-empty-state" class="character-card-container hidden" style="justify-content: center; align-items: center; text-align: center; padding: 24px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">👤</div>
+        <h3 style="font-family: var(--font-pixel); font-size: 11px; color: var(--gold-accent); margin-bottom: 8px;">CHƯA CÓ NHÂN VẬT</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+          Bạn chưa khởi tạo nhân vật D&D cho chiến dịch này. Hãy bắt đầu tạo nhân vật để bước vào giang hồ!
+        </p>
+        <button id="btn-trigger-char-create" class="pixel-btn primary-btn pulse-glow" style="padding: 10px 16px;">
+          ✨ KHỞI TẠO NHÂN VẬT D&D
+        </button>
+      </div>
+
+      <!-- Active Character Sheet Container -->
+      <div id="player-sheet-container" class="character-card-container">
+        <!-- Avatar & Basic Info -->
+        <div class="char-hero-section">
+          <div class="pixel-avatar-frame">
+            <canvas id="player-avatar-canvas" width="64" height="64"></canvas>
+            <span class="char-level-badge">LV.<span id="player-level">1</span></span>
+          </div>
+          <div class="char-title-block">
+            <h3 id="player-name" class="char-name">Vô Danh Kiếm Sĩ</h3>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <span id="player-class" class="char-class-badge">Kiếm Khách</span>
+              <span id="player-background-tag" class="char-class-badge" style="background: #064e3b; border-color: #059669; color: #a7f3d0;">Tán Tu</span>
+            </div>
+            <div class="cultivation-realm" id="player-realm">Cảnh Giới: Luyện Khí Tầng 1</div>
+          </div>
+        </div>
+
+        <!-- Vital Bars (HP, Qi, EXP) -->
+        <div class="vital-bars-section">
+          <!-- HP Bar -->
+          <div class="vital-bar-group">
+            <div class="bar-labels">
+              <span class="vital-title">❤️ KHÍ HUYẾT (HP)</span>
+              <span class="vital-value" id="hp-text">12 / 12</span>
+            </div>
+            <div class="pixel-progress-bar hp-bar">
+              <div class="bar-fill" id="hp-bar-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Qi / Mana Bar -->
+          <div class="vital-bar-group">
+            <div class="bar-labels">
+              <span class="vital-title">🌀 CHÂN KHÍ (QI)</span>
+              <span class="vital-value" id="qi-text">16 / 16</span>
+            </div>
+            <div class="pixel-progress-bar qi-bar">
+              <div class="bar-fill" id="qi-bar-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- EXP Bar -->
+          <div class="vital-bar-group">
+            <div class="bar-labels">
+              <span class="vital-title">⭐ TU VI (EXP)</span>
+              <span class="vital-value" id="exp-text">0 / 100</span>
+            </div>
+            <div class="pixel-progress-bar exp-bar">
+              <div class="bar-fill" id="exp-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- D&D Ability Stats Grid (6 Core Stats) -->
+        <div class="stats-section">
+          <div class="section-title-sm">CHỈ SỐ THUỘC TÍNH (D&D 5E)</div>
+          <div class="stats-grid">
+            <!-- STR -->
+            <div class="stat-card" data-stat="STR" title="Nhấn để đổ kiểm tra Sức Mạnh">
+              <span class="stat-label">STR (LỰC)</span>
+              <span class="stat-score" id="stat-str">15</span>
+              <span class="stat-mod" id="mod-str">+2</span>
+              <button class="stat-roll-btn" data-stat="STR">🎲</button>
+            </div>
+            <!-- AGI / DEX -->
+            <div class="stat-card" data-stat="AGI" title="Nhấn để đổ kiểm tra Thân Pháp">
+              <span class="stat-label">AGI (THÂN)</span>
+              <span class="stat-score" id="stat-agi">14</span>
+              <span class="stat-mod" id="mod-agi">+2</span>
+              <button class="stat-roll-btn" data-stat="AGI">🎲</button>
+            </div>
+            <!-- CON -->
+            <div class="stat-card" data-stat="CON" title="Nhấn để đổ kiểm tra Thể Chất">
+              <span class="stat-label">CON (THỂ)</span>
+              <span class="stat-score" id="stat-con">13</span>
+              <span class="stat-mod" id="mod-con">+1</span>
+              <button class="stat-roll-btn" data-stat="CON">🎲</button>
+            </div>
+            <!-- INT -->
+            <div class="stat-card" data-stat="INT" title="Nhấn để đổ kiểm tra Ngộ Tính">
+              <span class="stat-label">INT (NGỘ)</span>
+              <span class="stat-score" id="stat-int">12</span>
+              <span class="stat-mod" id="mod-int">+1</span>
+              <button class="stat-roll-btn" data-stat="INT">🎲</button>
+            </div>
+            <!-- WIS -->
+            <div class="stat-card" data-stat="WIS" title="Nhấn để đổ kiểm tra Thần Thức">
+              <span class="stat-label">WIS (THỨC)</span>
+              <span class="stat-score" id="stat-wis">10</span>
+              <span class="stat-mod" id="mod-wis">+0</span>
+              <button class="stat-roll-btn" data-stat="WIS">🎲</button>
+            </div>
+            <!-- CHA -->
+            <div class="stat-card" data-stat="CHA" title="Nhấn để đổ kiểm tra Mị Lực">
+              <span class="stat-label">CHA (MỊ)</span>
+              <span class="stat-score" id="stat-cha">8</span>
+              <span class="stat-mod" id="mod-cha">-1</span>
+              <button class="stat-roll-btn" data-stat="CHA">🎲</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs: Túi Đồ / Trang Bị / Võ Công -->
+        <div class="char-tabs-section">
+          <div class="pixel-tab-headers">
+            <button class="tab-btn active" data-tab="tab-inventory">TÚI ĐỒ</button>
+            <button class="tab-btn" data-tab="tab-equipment">TRANG BỊ</button>
+            <button class="tab-btn" data-tab="tab-skills">VÕ CÔNG</button>
+          </div>
+
+          <div class="tab-contents">
+            <!-- Tab 1: Inventory -->
+            <div id="tab-inventory" class="tab-pane active">
+              <div class="inventory-controls">
+                <span class="gold-count">💰 <span id="player-gold">50</span> Linh Thạch</span>
+              </div>
+              <ul id="inventory-list" class="pixel-list inventory-scroll">
+                <!-- Dynamically populated items -->
+              </ul>
+            </div>
+
+            <!-- Tab 2: Equipment -->
+            <div id="tab-equipment" class="tab-pane">
+              <div class="equipment-slots">
+                <div class="equip-slot">
+                  <span class="slot-name">⚔️ VŨ KHÍ:</span>
+                  <span id="equip-weapon" class="slot-item">Thanh Phong Kiếm (+1 Sát thương)</span>
+                </div>
+                <div class="equip-slot">
+                  <span class="slot-name">🥋 PHÁP Y:</span>
+                  <span id="equip-armor" class="slot-item">Hắc Sa Y (AC 12 + AGI)</span>
+                </div>
+                <div class="equip-slot">
+                  <span class="slot-name">📿 PHÁP BẢO:</span>
+                  <span id="equip-trinket" class="slot-item">Ngọc Bội Hộ Mệnh</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Skills / Spells -->
+            <div id="tab-skills" class="tab-pane">
+              <ul id="skills-list" class="pixel-list skills-scroll">
+                <!-- Dynamically populated skills -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ==================== CỘT GIỮA: KHUNG HỘI THOẠI & KỂ CHUYỆN ==================== -->
+    <section class="dashboard-col col-center pixel-box">
+      <!-- Pixel Scene Banner Canvas -->
+      <div class="scene-banner-container">
+        <canvas id="scene-canvas" width="600" height="150"></canvas>
+        <div class="scene-overlay-info">
+          <div class="scene-badge" id="scene-location-title">🏮 QUÁN TRỌ VONG HỒN (CÔ SƠN TRẠM)</div>
+          <div class="scene-atmosphere" id="scene-weather">Khí trời: Gió lạnh căm căm, tà khí vương vấn</div>
+        </div>
+      </div>
+
+      <!-- Active DC Challenge Notification Card (When DM demands a Roll) -->
+      <div id="active-dc-card" class="dc-challenge-box hidden">
+        <div class="dc-challenge-header">
+          <span class="dc-icon-alert">⚠️</span>
+          <span class="dc-title">YÊU CẦU KIỂM TRA KỸ NĂNG (D&D CHECK)!</span>
+        </div>
+        <div class="dc-challenge-body">
+          <p id="dc-challenge-desc">Quản trò yêu cầu kiểm tra Thân Pháp để né lưỡi đao ám sát!</p>
+          <div class="dc-challenge-meta">
+            <span class="dc-target">ĐỘ KHÓ: <strong>DC <span id="dc-target-val">14</span></strong></span>
+            <span class="dc-stat-req">CHỈ SỐ: <strong id="dc-stat-name">AGI (Thân Pháp)</strong></span>
+            <span class="dc-dice-type">XÍ NGẦU: <strong>d20</strong></span>
+          </div>
+        </div>
+        <div class="dc-challenge-actions">
+          <button id="btn-auto-roll-dc" class="pixel-btn accent-btn glow-pulse">
+            🎲 ĐỔ XÚC XẮC NGAY
+          </button>
+        </div>
+      </div>
+
+      <!-- Story Narrative Logs Feed -->
+      <div id="story-log-container" class="story-feed-container">
+        <!-- Messages will be dynamically rendered here -->
+      </div>
+
+      <!-- Typing Indicator -->
+      <div id="dm-typing-indicator" class="typing-indicator hidden">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="typing-text">Dungeon Master đang tính toán vận mệnh...</span>
+      </div>
+
+      <!-- Quick Action Chips -->
+      <div class="quick-action-bar">
+        <span class="quick-title">GỢI Ý:</span>
+        <button class="chip-btn" data-action="Ta rút vũ khí vào thế phòng thủ, cẩn trọng quan sát xung quanh.">⚔️ Vào thế thủ</button>
+        <button class="chip-btn" data-action="Ta tập trung thần thức, cảm nhận linh khí ma đạo gần đây.">👁️ Dò xét linh khí</button>
+        <button class="chip-btn" data-action="Ta cất tiếng chào hỏi, hỏi dò thông tin về tàn tích ma môn.">🗣️ Dò hỏi tin tức</button>
+        <button class="chip-btn" data-action="Ta lấy đan dược ra dùng để hồi phục chân khí.">🧘 Uống đan dược</button>
+        <button class="chip-btn" data-action="Ta ra hiệu cho đồng đội chuẩn bị phối hợp tác chiến!">👥 Báo hiệu đồng đội</button>
+      </div>
+
+      <!-- Story Action Input Box -->
+      <div class="action-input-container">
+        <form id="action-form" class="action-form">
+          <input 
+            type="text" 
+            id="action-input" 
+            class="pixel-input" 
+            placeholder="Nhập hành động hoặc lời thoại của bạn (vd: Ta vận khinh công nhảy lên nóc quán trọ...)" 
+            autocomplete="off"
+          />
+          <button type="submit" id="btn-submit-action" class="pixel-btn primary-btn send-btn">
+            <span>HÀNH ĐỘNG ↵</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== CỘT PHẢI: PARTY ĐỒNG ĐỘI AI + ĐỔ XÚC XẮC ==================== -->
+    <aside class="dashboard-col col-right">
+      
+      <!-- Box 1: AI Party Companions List -->
+      <div class="pixel-box party-box">
+        <div class="box-header">
+          <span class="header-icon">👥</span>
+          <h2>ĐỒNG ĐỘI ĐỒNG HÀNH (AI)</h2>
+          <button id="btn-party-banter" class="mini-pixel-btn" title="Kích hoạt trò chuyện ngẫu nhiên của nhóm">TRÒ CHUYỆN</button>
+        </div>
+
+        <div class="party-members-list" id="party-list">
+          <!-- Companion 1: Lãnh Hàn (Kiếm Khách) -->
+          <div class="companion-card" id="companion-lanh-han">
+            <div class="companion-top">
+              <div class="companion-avatar-wrap">
+                <canvas id="avatar-lanh-han" width="40" height="40"></canvas>
+              </div>
+              <div class="companion-info">
+                <div class="comp-name-row">
+                  <span class="comp-name">LÃNH HÀN</span>
+                  <span class="comp-class">Kiếm Khách</span>
+                </div>
+                <div class="comp-personality">"Kiếm chưa thấy máu, chưa thể tra vào bao."</div>
+              </div>
+            </div>
+            <div class="comp-stats-row">
+              <div class="comp-hp-wrap">
+                <span class="comp-hp-label">HP: <span id="hp-lanh-han">28/28</span></span>
+                <div class="pixel-progress-bar mini-bar">
+                  <div class="bar-fill hp-bar-fill" id="bar-lanh-han" style="width: 100%;"></div>
+                </div>
+              </div>
+              <button class="mini-action-btn" data-companion="lanh-han" title="Nhờ Lãnh Hàn ra chiêu phong tỏa">
+                ⚔️ Xuất Chiêu
+              </button>
+            </div>
+          </div>
+
+          <!-- Companion 2: Thanh Vân (Đạo Sĩ) -->
+          <div class="companion-card" id="companion-thanh-van">
+            <div class="companion-top">
+              <div class="companion-avatar-wrap">
+                <canvas id="avatar-thanh-van" width="40" height="40"></canvas>
+              </div>
+              <div class="companion-info">
+                <div class="comp-name-row">
+                  <span class="comp-name">THANH VÂN</span>
+                  <span class="comp-class">Đạo Sĩ Mao Sơn</span>
+                </div>
+                <div class="comp-personality">"Vạn vật tuần hoàn, chớ manh động phạm nghiệp."</div>
+              </div>
+            </div>
+            <div class="comp-stats-row">
+              <div class="comp-hp-wrap">
+                <span class="comp-hp-label">HP: <span id="hp-thanh-van">22/22</span></span>
+                <div class="pixel-progress-bar mini-bar">
+                  <div class="bar-fill hp-bar-fill" id="bar-thanh-van" style="width: 100%;"></div>
+                </div>
+              </div>
+              <button class="mini-action-btn" data-companion="thanh-van" title="Nhờ Thanh Vân dùng bùa hộ mệnh/trừ tà">
+                📜 Niệm Phù
+              </button>
+            </div>
+          </div>
+
+          <!-- Companion 3: Dạ Nguyệt (Thuật Sĩ / Ám Tinh) -->
+          <div class="companion-card" id="companion-da-nguyet">
+            <div class="companion-top">
+              <div class="companion-avatar-wrap">
+                <canvas id="avatar-da-nguyet" width="40" height="40"></canvas>
+              </div>
+              <div class="companion-info">
+                <div class="comp-name-row">
+                  <span class="comp-name">DẠ NGUYỆT</span>
+                  <span class="comp-class">Ám Tinh Thích Khách</span>
+                </div>
+                <div class="comp-personality">"Trong bóng tối, sơ hở của ngươi là mạng sống."</div>
+              </div>
+            </div>
+            <div class="comp-stats-row">
+              <div class="comp-hp-wrap">
+                <span class="comp-hp-label">HP: <span id="hp-da-nguyet">24/24</span></span>
+                <div class="pixel-progress-bar mini-bar">
+                  <div class="bar-fill hp-bar-fill" id="bar-da-nguyet" style="width: 100%;"></div>
+                </div>
+              </div>
+              <button class="mini-action-btn" data-companion="da-nguyet" title="Nhờ Dạ Nguyệt do thám sơ hở / ám kích">
+                🗡️ Ám Kích
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Box 2: Interactive 2D/3D Dice Roller Tray -->
+      <div class="pixel-box dice-box">
+        <div class="box-header">
+          <span class="header-icon">🎲</span>
+          <h2>BÀN ĐỔ XÚC XẮC (DICE ROLLER)</h2>
+          <span id="active-dice-badge" class="dice-badge">d20</span>
+        </div>
+
+        <!-- Dice Tray Canvas & Result Area -->
+        <div class="dice-tray-area">
+          <canvas id="dice-canvas" width="280" height="130"></canvas>
+          <div class="dice-result-overlay">
+            <div id="dice-big-result" class="big-result">20</div>
+            <div id="dice-breakdown" class="result-formula">18 (d20) + 2 (STR) = 20</div>
+            <div id="dice-verdict" class="verdict-tag success">THÀNH CÔNG RỰC RỠ!</div>
+          </div>
+        </div>
+
+        <!-- Dice Selector Buttons (d4, d6, d8, d10, d12, d20, d100) -->
+        <div class="dice-selection-grid">
+          <button class="dice-select-btn" data-dice="d4">d4</button>
+          <button class="dice-select-btn" data-dice="d6">d6</button>
+          <button class="dice-select-btn" data-dice="d8">d8</button>
+          <button class="dice-select-btn" data-dice="d10">d10</button>
+          <button class="dice-select-btn" data-dice="d12">d12</button>
+          <button class="dice-select-btn active" data-dice="d20">d20</button>
+          <button class="dice-select-btn" data-dice="d100">d100</button>
+        </div>
+
+        <!-- Modifier Selector & Roll Trigger -->
+        <div class="modifier-row">
+          <div class="mod-selector">
+            <label for="select-modifier">CHỈ SỐ CỘNG:</label>
+            <select id="select-modifier" class="pixel-select">
+              <option value="STR">STR (Lực: +2)</option>
+              <option value="AGI">AGI (Thân: +2)</option>
+              <option value="CON">CON (Thể: +1)</option>
+              <option value="INT">INT (Ngộ: +1)</option>
+              <option value="WIS">WIS (Thức: +0)</option>
+              <option value="CHA">CHA (Mị: -1)</option>
+              <option value="NONE" selected>Không cộng (0)</option>
+            </select>
+          </div>
+          <div class="mod-custom">
+            <label for="custom-mod">THÊM:</label>
+            <input type="number" id="custom-mod" class="pixel-num-input" value="0" min="-10" max="20" />
+          </div>
+        </div>
+
+        <!-- Action Roll Buttons -->
+        <div class="roll-action-buttons">
+          <button id="btn-roll-dice" class="pixel-btn primary-btn roll-main-btn">
+            🎲 ĐỔ NGAY!
+          </button>
+          <button id="btn-send-roll-to-dm" class="pixel-btn accent-btn" disabled title="Gửi kết quả xúc xắc này cho Quản trò (DM)">
+            📩 GỬI CHO DM
+          </button>
+        </div>
+
+        <!-- Dice Roll History -->
+        <div class="dice-history-section">
+          <div class="history-title">LỊCH SỬ ĐỔ GẦN ĐÂY:</div>
+          <div id="dice-history-list" class="history-tags-wrap">
+            <span class="hist-tag success">d20: 18 + 2 = 20 ✓</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: 9router API Configuration -->
+  <div id="modal-settings" class="modal-backdrop hidden">
+    <div class="modal-dialog pixel-box">
+      <div class="box-header">
+        <span class="header-icon">⚙️</span>
+        <h2>CẤU HÌNH 9ROUTER / LLM ENDPOINT</h2>
+        <button class="modal-close-btn" data-close="modal-settings">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          Kết nối đến 9router (OpenAI-compatible Custom Proxy). Hệ thống sẽ gửi System Prompt Dungeon Master chuẩn mực và tự động điều phối AI Party.
+        </p>
+
+        <div class="form-group">
+          <label>CHẾ ĐỘ KẾT NỐI (CONNECTION ROUTE):</label>
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px; background: var(--bg-dark); padding: 8px; border: 1px solid var(--border-light);">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer; color: var(--green-light);">
+              <input type="radio" name="cfg-route-mode" id="route-mode-proxy" value="proxy" checked>
+              <span>🚀 <strong>Qua Local Proxy /proxy/v1</strong> (Khuyên dùng - Khắc phục triệt để lỗi CORS & socket abort)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer; color: var(--text-muted);">
+              <input type="radio" name="cfg-route-mode" id="route-mode-direct" value="direct">
+              <span>⚡ <strong>Trực tiếp tới 9router</strong> (Direct Port 20128)</span>
+            </label>
+          </div>
+          <small class="form-help">Proxy nội bộ giúp web game gửi request chuẩn HTTP backend tới 9router mà không bị trình duyệt chặn preflight.</small>
+        </div>
+
+        <div class="form-group" id="group-base-url">
+          <label for="cfg-base-url">9ROUTER BASE URL (TRỰC TIẾP):</label>
+          <input 
+            type="text" 
+            id="cfg-base-url" 
+            class="pixel-input" 
+            value="http://127.0.0.1:20128/v1" 
+            placeholder="http://127.0.0.1:20128/v1"
+          />
+          <small class="form-help">Mặc định: http://127.0.0.1:20128/v1 (IPv4 loopback tránh lỗi IPv6 ::1)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="cfg-api-key">API KEY:</label>
+          <input 
+            type="password" 
+            id="cfg-api-key" 
+            class="pixel-input" 
+            value="" 
+            placeholder="Nhập API Key của 9router (Lưu an toàn trong LocalStorage)"
+          />
+          <small class="form-help">API Key được lưu bảo mật trong trình duyệt và gửi qua Header Authorization: Bearer</small>
+        </div>
+
+        <div class="form-group">
+          <label for="cfg-model-name">MODEL NAME:</label>
+          <div class="input-with-presets">
+            <input 
+              type="text" 
+              id="cfg-model-name" 
+              class="pixel-input" 
+              value="owner" 
+              placeholder="owner hoặc model ID"
+            />
+          </div>
+          <div class="preset-chips">
+            <button type="button" class="preset-chip active" data-model="owner">owner</button>
+            <button type="button" class="preset-chip" data-model="ag/gemini-3.8-flash">ag/gemini-3.8-flash</button>
+            <button type="button" class="preset-chip" data-model="ag/claude-sonnet-4-6">ag/claude-sonnet-4-6</button>
+            <button type="button" class="preset-chip" data-model="ag/gpt-oss-120b-medium">ag/gpt-oss-120b</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="cfg-temperature">NHIỆT ĐỘ (CREATIVITY):</label>
+            <input type="range" id="cfg-temperature" min="0.1" max="1.2" step="0.1" value="0.7">
+            <span id="temp-val" class="slider-val">0.7</span>
+          </div>
+
+          <div class="form-group half">
+            <label>MÔ PHỎNG DỰ PHÒNG (OFFLINE):</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="cfg-offline-fallback" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <small class="form-help">Tự động kích hoạt AI D&D nội bộ nếu 9router chưa chạy</small>
+          </div>
+        </div>
+
+        <!-- Connection Test Result Area -->
+        <div id="test-connection-result" class="connection-status-box hidden">
+          <span class="status-icon">🔄</span>
+          <span class="status-msg">Đang kiểm tra kết nối...</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-test-connection" class="pixel-btn secondary-btn">
+          ⚡ TEST KẾT NỐI
+        </button>
+        <button id="btn-save-settings" class="pixel-btn primary-btn">
+          💾 LƯU CẤU HÌNH
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Authentic D&D 5E Character Creation Wizard -->
+  <div id="modal-char-create" class="modal-backdrop hidden">
+    <div class="modal-dialog pixel-box modal-lg">
+      <div class="box-header">
+        <span class="header-icon">🪪</span>
+        <h2>KHỞI TẠO NHÂN VẬT D&D 5E PHƯƠNG ĐÔNG</h2>
+        <button id="btn-close-char-create" class="modal-close-btn" data-close="modal-char-create">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="create-grid">
+          <!-- Cột Trái: Danh Tính, Hệ Lớp, Xuất Thân & Ngoại Hình -->
+          <div class="create-col-left">
+            <div class="form-group">
+              <label for="create-name">HỌ TÊN & DANH HIỆU (NAME):</label>
+              <input type="text" id="create-name" class="pixel-input" value="Bạch Ngọc Đường" maxlength="25" placeholder="Nhập tên nhân vật">
+            </div>
+
+            <!-- Chọn Chiến Dịch Phiêu Lưu -->
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="margin: 0;">0. CHỌN CHIẾN DỊCH PHIÊU LƯU (CAMPAIGN):</label>
+                <button type="button" class="mini-pixel-btn" id="btn-random-campaign" title="Chọn ngẫu nhiên chiến dịch">🎲 NGẪU NHIÊN</button>
+              </div>
+              <div class="campaign-picker-grid" id="create-campaign-picker">
+                <!-- Dynamically populated campaign cards -->
+              </div>
+            </div>
+
+            <!-- Môn Phái / Lớp Nhân Vật -->
+            <div class="form-group">
+              <label>1. CHỌN MÔN PHÁI / HỆ LỚP (CLASS):</label>
+              <div class="class-picker-grid" id="create-class-picker">
+                <div class="class-card active" data-class="kiem-khach">
+                  <div class="class-header-row">
+                    <span class="class-title">🗡️ Kiếm Khách</span>
+                    <span class="class-hitdie">Hit Die: d10</span>
+                  </div>
+                  <div class="class-desc">Lấy kiếm nhập đạo, thân thủ linh hoạt, kiếm khí sắc lẹm. (+STR, +AGI)</div>
+                </div>
+
+                <div class="class-card" data-class="tu-si">
+                  <div class="class-header-row">
+                    <span class="class-title">🥋 Tu Sĩ Khí Công</span>
+                    <span class="class-hitdie">Hit Die: d12</span>
+                  </div>
+                  <div class="class-desc">Kim cương bất hoại, đan điền thâm hậu, quyền cước như rồng. (+CON, +WIS)</div>
+                </div>
+
+                <div class="class-card" data-class="am-duong-su">
+                  <div class="class-header-row">
+                    <span class="class-title">☯️ Âm Dương Sư</span>
+                    <span class="class-hitdie">Hit Die: d6</span>
+                  </div>
+                  <div class="class-desc">Phù chú ngũ hành, thức thần sai khiến, định hồn đoạn phách. (+INT, +WIS)</div>
+                </div>
+
+                <div class="class-card" data-class="han-si">
+                  <div class="class-header-row">
+                    <span class="class-title">📜 Hàn Sĩ Đan Đạo</span>
+                    <span class="class-hitdie">Hit Die: d8</span>
+                  </div>
+                  <div class="class-desc">Hạo nhiên chính khí, đan dược chữa lành, tài mạo xuất chúng. (+INT, +CHA)</div>
+                </div>
+
+                <div class="class-card" data-class="thich-khach">
+                  <div class="class-header-row">
+                    <span class="class-title">🥷 Ám Dạ Thích Khách</span>
+                    <span class="class-hitdie">Hit Die: d8</span>
+                  </div>
+                  <div class="class-desc">Thân pháp quỷ mị, ám khí đoạt mạng, nhất kích tất sát. (+AGI, +INT)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Xuất Thân Giang Hồ -->
+            <div class="form-group">
+              <label>2. XUẤT THÂN GIANG HỒ (BACKGROUND):</label>
+              <div class="background-picker-grid" id="create-bg-picker">
+                <div class="bg-card active" data-bg="tan-tu">
+                  <div class="bg-title">🌲 Tán Tu Tự Do (+1 AGI Thân Pháp)</div>
+                  <div class="bg-desc">Độc lai độc vãng, kinh nghiệm sinh tồn giữa núi rừng hoang sơ.</div>
+                </div>
+                <div class="bg-card" data-bg="mon-phai">
+                  <div class="bg-title">🏛️ Đệ Tử Danh Môn (+1 INT Ngộ Tính)</div>
+                  <div class="bg-desc">Được tông môn lớn rèn giũa, thông tuệ kinh văn và trận pháp.</div>
+                </div>
+                <div class="bg-card" data-bg="the-gia">
+                  <div class="bg-title">💎 Thế Gia Vọng Tộc (+1 CHA Mị Lực, +25 Linh Thạch)</div>
+                  <div class="bg-desc">Gia thế trâm anh thế phiệt, giao thiệp rộng, tài nguyên dồi dào.</div>
+                </div>
+                <div class="bg-card" data-bg="san-yeu">
+                  <div class="bg-title">🐺 Thợ Săn Yêu Ma (+1 WIS Thần Thức)</div>
+                  <div class="bg-desc">Lăn lộn nơi hiểm địa, giác quan bén nhạy trước yêu khí độc tà.</div>
+                </div>
+                <div class="bg-card" data-bg="hoa-thi">
+                  <div class="bg-title">🔥 Hỏa Đầu Quân / Thợ Rèn (+1 CON Thể Chất, +3 HP)</div>
+                  <div class="bg-desc">Thân thể tôi luyện cùng gang thép lửa đỏ, khí huyết sung mãn.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Avatar Appearance Choice -->
+            <div class="form-group">
+              <label>3. CHỌN NGOẠI HÌNH PIXEL (AVATAR):</label>
+              <div class="avatar-choices-row" id="avatar-choices">
+                <!-- Dynamically rendered pixel portraits -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột Phải: Phân Bổ Chỉ Số D&D 5E -->
+          <div class="create-col-right">
+            <div class="form-group">
+              <label>4. PHƯƠNG THỨC PHÂN BỔ CHỈ SỐ D&D 5E:</label>
+              <div class="stat-methods-bar">
+                <button type="button" class="method-btn active" id="btn-method-pointbuy">POINT BUY (27Đ)</button>
+                <button type="button" class="method-btn" id="btn-method-standard">DÃY CHUẨN</button>
+                <button type="button" class="method-btn" id="btn-method-roll4d6">🎲 ĐỔ 4d6</button>
+              </div>
+            </div>
+            
+            <div class="stat-alloc-grid">
+              <!-- STR -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">STR (Sức Mạnh)</span>
+                <button class="alloc-btn dec" data-stat="STR">-</button>
+                <span class="alloc-val" id="alloc-str">15</span>
+                <button class="alloc-btn inc" data-stat="STR">+</button>
+                <span class="alloc-bonus" id="bonus-str">+0</span>
+                <span class="alloc-mod" id="alloc-mod-str">+2</span>
+              </div>
+              <!-- AGI -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">AGI (Thân Pháp)</span>
+                <button class="alloc-btn dec" data-stat="AGI">-</button>
+                <span class="alloc-val" id="alloc-agi">14</span>
+                <button class="alloc-btn inc" data-stat="AGI">+</button>
+                <span class="alloc-bonus" id="bonus-agi">+1</span>
+                <span class="alloc-mod" id="alloc-mod-agi">+2</span>
+              </div>
+              <!-- CON -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">CON (Thể Chất)</span>
+                <button class="alloc-btn dec" data-stat="CON">-</button>
+                <span class="alloc-val" id="alloc-con">13</span>
+                <button class="alloc-btn inc" data-stat="CON">+</button>
+                <span class="alloc-bonus" id="bonus-con">+0</span>
+                <span class="alloc-mod" id="alloc-mod-con">+1</span>
+              </div>
+              <!-- INT -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">INT (Ngộ Tính)</span>
+                <button class="alloc-btn dec" data-stat="INT">-</button>
+                <span class="alloc-val" id="alloc-int">12</span>
+                <button class="alloc-btn inc" data-stat="INT">+</button>
+                <span class="alloc-bonus" id="bonus-int">+0</span>
+                <span class="alloc-mod" id="alloc-mod-int">+1</span>
+              </div>
+              <!-- WIS -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">WIS (Thần Thức)</span>
+                <button class="alloc-btn dec" data-stat="WIS">-</button>
+                <span class="alloc-val" id="alloc-wis">10</span>
+                <button class="alloc-btn inc" data-stat="WIS">+</button>
+                <span class="alloc-bonus" id="bonus-wis">+0</span>
+                <span class="alloc-mod" id="alloc-mod-wis">+0</span>
+              </div>
+              <!-- CHA -->
+              <div class="alloc-row">
+                <span class="stat-name-tag">CHA (Mị Lực)</span>
+                <button class="alloc-btn dec" data-stat="CHA">-</button>
+                <span class="alloc-val" id="alloc-cha">8</span>
+                <button class="alloc-btn inc" data-stat="CHA">+</button>
+                <span class="alloc-bonus" id="bonus-cha">+0</span>
+                <span class="alloc-mod" id="alloc-mod-cha">-1</span>
+              </div>
+            </div>
+
+            <!-- Point buy pool info -->
+            <div class="alloc-pool-info" id="alloc-pool-container">
+              <span>ĐIỂM POINT BUY CÒN LẠI:</span>
+              <strong id="alloc-pool-pts" style="color: var(--gold-primary); font-size: 11px;">0 / 27</strong>
+            </div>
+
+            <!-- Live Combat Metrics Summary -->
+            <div class="create-summary-box">
+              <div class="summary-heading">⚔️ THÔNG SỐ CHIẾN ĐẤU D&D (CẤP 1):</div>
+              <div class="summary-metrics-row">
+                <div class="metric-tag">❤️ HP: <strong id="preview-hp">11</strong></div>
+                <div class="metric-tag">🛡️ AC: <strong id="preview-ac">14</strong></div>
+                <div class="metric-tag">🌀 QI: <strong id="preview-qi">15</strong></div>
+                <div class="metric-tag">💰 VÀNG: <strong id="preview-gold">50</strong></div>
+              </div>
+              <div class="summary-line">🗡️ <strong>Vũ khí:</strong> <span id="preview-weapon">Thanh Phong Cổ Kiếm (1d8+STR)</span></div>
+              <div class="summary-line">🎒 <strong>Túi đồ:</strong> 2x Đại Hoàn Đan (+20 HP), 3x Tụ Khí Tán (+15 Qi), Bùa Thần Hành.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-confirm-character" class="pixel-btn primary-btn large-btn pulse-glow" style="padding: 10px 20px; font-size: 11px;">
+          ✨ BƯỚC VÀO THẾ GIỚI CỬU CHÂU (BẮT ĐẦU CHIẾN DỊCH)!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Save / Load / Reset Game -->
+  <div id="modal-save" class="modal-backdrop hidden">
+    <div class="modal-dialog pixel-box">
+      <div class="box-header">
+        <span class="header-icon">💾</span>
+        <h2>QUẢN LÝ LƯU TIẾN TRÌNH GAME</h2>
+        <button class="modal-close-btn" data-close="modal-save">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          Toàn bộ lịch sử hành trình, chỉ số nhân vật, đồng đội AI và nhật ký đối thoại đều được tự động lưu vào LocalStorage của trình duyệt.
+        </p>
+
+        <div class="save-status-info">
+          <div>LẦN LƯU CUỐI: <strong id="last-saved-time">Vừa xong</strong></div>
+          <div>SỐ LƯỢT ĐÃ CHƠI: <strong id="save-turn-display">1</strong></div>
+        </div>
+
+        <div class="save-action-grid">
+          <button id="btn-manual-save" class="pixel-btn primary-btn">
+            💾 LƯU NGAY BÂY GIỜ
+          </button>
+          <button id="btn-export-save" class="pixel-btn secondary-btn">
+            📤 XUẤT FILE SAVE (JSON)
+          </button>
+          <label class="pixel-btn secondary-btn file-upload-btn">
+            📥 NHẬP FILE SAVE
+            <input type="file" id="file-import-save" accept=".json" style="display: none;">
+          </label>
+          <button id="btn-reset-game" class="pixel-btn danger-btn">
+            ⚠️ BẮT ĐẦU LẠI TỪ ĐẦU
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="pixel-btn secondary-btn" data-close="modal-save">ĐÓNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Adventure Chronicle & Long-term AI Memory Journal -->
+  <div id="modal-chronicle" class="modal-backdrop hidden">
+    <div class="modal-dialog pixel-box modal-lg">
+      <div class="box-header">
+        <span class="header-icon">📜</span>
+        <h2>GIANG HỒ BIÊN NIÊN SỬ & KÝ ỨC DÀI HẠN</h2>
+        <button class="modal-close-btn" data-close="modal-chronicle">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Active Campaign Header Card -->
+        <div class="chronicle-campaign-banner" id="chronicle-campaign-info">
+          <div class="camp-banner-title">
+            <span id="chronicle-camp-icon">🏮</span>
+            <span id="chronicle-camp-title">Vạn Yêu Cô Sơn: Oán Khí Quán Trọ</span>
+          </div>
+          <div class="camp-banner-goal" id="chronicle-camp-goal">
+            Mục tiêu: Điều tra tung tích đoàn thương nhân mất tích và hóa giải oán linh.
+          </div>
+        </div>
+
+        <!-- Chronicle Tabs -->
+        <div class="pixel-tab-headers" style="margin-bottom: 12px;">
+          <button class="tab-btn active" data-tab="tab-chronicle-milestones">MỐC SỰ KIỆN (TIMELINE)</button>
+          <button class="tab-btn" data-tab="tab-chronicle-lore">SỔ TAY THẾ GIỚI (LOREBOOK)</button>
+          <button class="tab-btn" data-tab="tab-chronicle-quests">LỜI THỀ & NHIỆM VỤ (QUESTS)</button>
+        </div>
+
+        <div class="tab-contents">
+          <!-- Tab 1: Milestones Timeline -->
+          <div id="tab-chronicle-milestones" class="tab-pane active">
+            <div id="chronicle-timeline-list" class="chronicle-scroll">
+              <!-- Milestones populated by JS -->
+            </div>
+          </div>
+
+          <!-- Tab 2: Lorebook -->
+          <div id="tab-chronicle-lore" class="tab-pane">
+            <div id="chronicle-lore-list" class="chronicle-scroll">
+              <!-- Lore populated by JS -->
+            </div>
+          </div>
+
+          <!-- Tab 3: Quests -->
+          <div id="tab-chronicle-quests" class="tab-pane">
+            <div id="chronicle-quests-list" class="chronicle-scroll">
+              <!-- Quests populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="pixel-btn secondary-btn" data-close="modal-chronicle">ĐÓNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast / Retro Notification Bubble -->
+  <div id="retro-toast" class="retro-toast hidden">
+    <span id="toast-text">Đã lưu tiến trình thành công!</span>
+  </div>
+
+  <!-- Application Scripts (Vanilla ES6 Modules) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
